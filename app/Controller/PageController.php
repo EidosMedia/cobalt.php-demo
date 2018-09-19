@@ -12,7 +12,7 @@ class PageController {
 
     public function renderPageByPath($request, $response, $args) {
         $path = $args['path'];
-        return $this->renderPage('/', $request, $response, $args);
+        return $this->renderPage($path, $request, $response, $args);
     }
 
     public function renderPageById($request, $response, $args) {
