@@ -1,7 +1,7 @@
 RewriteEngine On
 
-SetEnv CPD_DISCOVERYURI "http://localhost:8080/discovery"
-SetEnv CPD_SITENAME "test-site"
+#SetEnv CPD_DISCOVERYURI "http://localhost:8080/discovery"
+#SetEnv CPD_SITENAME "test-site"
 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
