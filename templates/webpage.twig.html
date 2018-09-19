@@ -1,0 +1,15 @@
+{% extends 'base.twig.html' %}
+
+{% block content %}
+
+        {% for zoneName in page.model.zonesNames %}
+          <h1 class="my-4 zoneName">{{ zoneName }}</h1>
+          {% for node in page.model.zoneNodes(zoneName) %}
+            {% include [('_partials/' ~ node.type ~ '.twig.html'), ('_partials/' ~ node.baseType ~ '.twig.html'), ('_partials/default.twig.html')] with {
+              node: node,
+              page: page
+            } %}
+          {% endfor %}
+        {% endfor %}
+
+{% endblock %}

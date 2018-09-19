@@ -1,0 +1,19 @@
+          <div class="card mb-4">
+            {% if node.pictureId is defined and node.pictureId is not null %}
+            <img class="card-img-top" src="{{ page.resourceUrl(node.pictureId) }}" alt="Card image cap">
+            {% endif %}
+            <div class="card-body">
+              <h2 class="card-title">{{ node.title }}</h2>
+              <p class="card-text">{{ node.summary }}</p>
+              <a href="{{ evalUrl(node) }}" class="btn btn-primary">Read More &rarr;</a>
+            </div>
+            <div class="card-footer text-muted">
+              Posted on {{ node.creationTime|date('F d, Y') }} 
+              {% if node.authors is iterable %} 
+              by 
+                {% for author in node.authors %}
+              <a href="#">{{ author }}</a>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>

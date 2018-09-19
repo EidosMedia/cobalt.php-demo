@@ -1,0 +1,3 @@
+RewriteEngine on
+RewriteCond %{REQUEST_URI} ^(.*)/cobalt.php-demo/(.*)$
+RewriteRule ^(.*)$ %1/cobalt.php-demo/public/%2 [R=301,NC,L]

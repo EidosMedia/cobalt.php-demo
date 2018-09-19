@@ -1,0 +1,7 @@
+          <h1 class="my-4 zoneName query">{{ node.title }}</h1>
+          {% for childNode in page.model.childNodes(node) %}
+            {% include [('_partials/' ~ childNode.type ~ '.twig.html'), ('_partials/' ~ childNode.baseType ~ '.twig.html'), ('_partials/default.twig.html')] with {
+              node: childNode,
+              page: page
+            } %}
+          {% endfor %}

@@ -1,0 +1,42 @@
+{% extends 'base.twig.html' %}
+
+{% block content %}
+          <h1 class="my-4">{{ page.siteNode.title }}
+            <small>{{ page.siteNode.description }}</small>
+          </h1>
+
+          <!-- Blog Post -->
+          {% for childNode in page.model.childNodes %}
+          <div class="card mb-4">
+            {% if childNode.pictureId is defined and childNode.pictureId is not null %}
+            <img class="card-img-top" src="{{ page.resourceUrl(childNode.pictureId) }}" alt="Card image cap">
+            {% endif %}
+            <div class="card-body">
+              <h2 class="card-title">{{ childNode.title }}</h2>
+              <p class="card-text">{{ childNode.summary }}</p>
+              <a href="{{ evalUrl(childNode) }}" class="btn btn-primary">Read More &rarr;</a>
+            </div>
+            <div class="card-footer text-muted">
+              Posted on {{ childNode.creationTime|date('F d, Y') }} 
+              {% if childNode.authors is iterable %} 
+              by 
+                {% for author in childNode.authors %}
+              <a href="#">{{ author }}</a>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+
+          <!-- Pagination -->
+          <!--
+          <ul class="pagination justify-content-center mb-4">
+            <li class="page-item">
+              <a class="page-link" href="#">&larr; Older</a>
+            </li>
+            <li class="page-item disabled">
+              <a class="page-link" href="#">Newer &rarr;</a>
+            </li>
+          </ul>
+          -->
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.twig.html' %}
+
+{% block content %}
+          <!-- Title -->
+          <h1 class="mt-4">{{ page.currentObject.title }}</h1>
+
+          <!-- Author -->
+          <p class="lead">
+            by
+            {% for author in page.currentObject.authors %}
+            <a href="#">{{ author }}</a>
+            {% endfor %}
+          </p>
+
+          <hr>
+
+          <!-- Date/Time -->
+          <p>Posted on {{ page.currentObject.creationTime|date('F d, Y \\a\\t H:m:s') }} </p>
+
+          <hr>
+
+          {% if page.currentObject.pictureId is defined and page.currentObject.pictureId is not null %}
+          <!-- Preview Image -->
+          <img class="img-fluid rounded" src="{{ page.resourceUrl(page.currentObject.pictureId) }}" alt="">
+
+          <hr>
+          {% endif %}
+
+          <!-- Post Content -->
+          {{ page.currentObject.transformContentDocument(source('_xslt/article.xsl'))|raw }}
+{% endblock %}

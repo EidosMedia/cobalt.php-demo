@@ -1,0 +1,9 @@
+        {% for zoneName in node.zonesNames %}
+          <h1 class="my-4 zoneName webContainer">{{ zoneName }}</h1>
+          {% for childNode in page.model.zoneNodes(zoneName, node) %}
+            {% include [('_partials/' ~ childNode.type ~ '.twig.html'), ('_partials/' ~ childNode.baseType ~ '.twig.html'), ('_partials/default.twig.html')] with {
+              node: childNode,
+              page: page
+            } %}
+          {% endfor %}
+        {% endfor %}
