@@ -1,12 +1,13 @@
 FROM composer as builder
 COPY . .
-RUN ls
-RUN composer install
+RUN composer install && mv public ../ && rm composer.json && rm composer.lock
 
 FROM php:apache
 
-RUN a2enmod rewrite
 
-COPY --from=builder /app /var/www/html
+COPY --from=builder /app /var/www
+COPY --from=builder /public /var/www/html
+
+RUN a2enmod rewrite && apt-get update -y && apt-get install -y libxslt1.1 libxslt1-dev && docker-php-ext-install xsl
 
 EXPOSE 80
