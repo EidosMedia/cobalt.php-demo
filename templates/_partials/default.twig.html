@@ -8,7 +8,7 @@
               <a href="{{ evalUrl(node) }}" class="btn btn-primary">Read More &rarr;</a>
             </div>
             <div class="card-footer text-muted">
-              Posted on {{ node.creationTime|date('F d, Y') }} 
+              Posted on {{ node.sys.creationTime|date('F d, Y') }} 
               {% if node.authors is iterable %} 
               by 
                 {% for author in node.authors %}

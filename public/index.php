@@ -1,5 +1,4 @@
 <?php
 
-require __DIR__ . '/../bootstrap/app.php';
-
+require_once('../app/autoload.php');
 $app->run();

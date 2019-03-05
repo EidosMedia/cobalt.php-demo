@@ -5,7 +5,7 @@
         {% for zoneName in page.model.zonesNames %}
           <h1 class="my-4 zoneName">{{ zoneName }}</h1>
           {% for node in page.model.zoneNodes(zoneName) %}
-            {% include [('_partials/' ~ node.type ~ '.twig.html'), ('_partials/' ~ node.baseType ~ '.twig.html'), ('_partials/default.twig.html')] with {
+            {% include [('_partials/' ~ node.sys.type ~ '.twig.html'), ('_partials/' ~ node.sys.baseType ~ '.twig.html'), ('_partials/default.twig.html')] with {
               node: node,
               page: page
             } %}

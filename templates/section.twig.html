@@ -17,7 +17,7 @@
               <a href="{{ evalUrl(childNode) }}" class="btn btn-primary">Read More &rarr;</a>
             </div>
             <div class="card-footer text-muted">
-              Posted on {{ childNode.creationTime|date('F d, Y') }} 
+              Posted on {{ childNode.sys.creationTime|date('F d, Y') }} 
               {% if childNode.authors is iterable %} 
               by 
                 {% for author in childNode.authors %}

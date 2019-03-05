@@ -4,7 +4,7 @@ namespace App\Controller;
 
 class PageController {
 
-    private $view;
+    private $container = null;
 
     public function __construct($container) {
         $this->container = $container;
@@ -16,19 +16,16 @@ class PageController {
     }
 
     public function renderPageById($request, $response, $args) {
-        $section = $args['section'];
         $id = $args['id'];
-        $title = $args['title'];
         return $this->renderPage($id, $request, $response, $args);
     }
 
     private function renderPage($nodeOrIdOrPath, $request, $response, $args) {
-        $siteName = $this->container->get('settings')['siteName'];
-        $page = $this->container->siteService->getPage($siteName, $nodeOrIdOrPath);
+        $page = $this->container->siteService->getPage($nodeOrIdOrPath);
         $currentObject = $page->getCurrentObject();
-        $template = $currentObject->getType() . '.twig.html';
+        $template = $currentObject->getSys()->getType() . '.twig.html';
         if (!$this->container->view->getLoader()->exists($template)) {
-            $template = $currentObject->getBaseType() . '.twig.html';
+            $template = $currentObject->getSys()->getBaseType() . '.twig.html';
             if (!$this->container->view->getLoader()->exists($template)) {
                 // TODO: 500 error, template not available
             }
@@ -38,4 +35,5 @@ class PageController {
             'sitemap' => $this->container->sitemap
         ]);
     }
+
 }
