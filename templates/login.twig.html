@@ -1,0 +1,13 @@
+{% block content %}
+<div class="row">
+        <form action="/login" method="POST">
+        <div class="col-xs-4 input-group">
+            <input id="txtUsername" name="txtUsername" type="text" class="form-control" placeholder="Username" required autofocus>
+            &nbsp;&nbsp;
+            <input id="txtPassword" name="txtPassword" type="password" class="form-control" placeholder="Password" required>
+            &nbsp;&nbsp;
+            <button id="btnLogin" class="btn btn-secondary" type="submit">Login</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

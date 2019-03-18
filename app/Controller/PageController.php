@@ -27,13 +27,23 @@ class PageController {
         if (!$this->container->view->getLoader()->exists($template)) {
             $template = $currentObject->getSys()->getBaseType() . '.twig.html';
             if (!$this->container->view->getLoader()->exists($template)) {
-                // TODO: 500 error, template not available
+                // 500 error - template not available
+                $template = 'error.twig.html';
+                $args['error'] = 'Template not found for type ' . $currentObject->getSys()->getType();
             }
         }
-        return $this->container->view->render($response, $template, [
+
+        $context = [
             'page' => $page,
             'sitemap' => $this->container->sitemap
-        ]);
+        ];
+
+        if (isset($args['error'])) {
+            $template = 'error.twig.html';
+            $context['error'] = $args['error'];
+        }
+
+        return $this->container->view->render($response, $template, $context);
     }
 
 }

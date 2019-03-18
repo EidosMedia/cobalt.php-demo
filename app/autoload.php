@@ -2,8 +2,10 @@
 
 namespace App;
 
+use App\Controller\AuthController;
 use App\Controller\PageController;
 use Eidosmedia\Cobalt\CobaltSDK;
+use Eidosmedia\Cobalt\Commons\Exceptions\ServiceNotAvailableException;
 use Slim\App;
 use Slim\Views\Twig;
 use Slim\Views\TwigExtension;
@@ -13,10 +15,10 @@ class Autoload {
     
     private $app = null;
     private $container = null;
-    private $sdk = null;
     private $settings = null;
-    private $sitemap = null;
+    private $sdk = null;
     private $siteService = null;
+    private $sitemap = null;
     
     public function __construct($settings) {
         // load slim, twig and other dependencies only if autoload class is instanciated
@@ -25,39 +27,45 @@ class Autoload {
 
         // start slim/twig with all settings from settings.php
         $this->app = new App(['settings' => $settings]);
+        $this->container = $this->app->getContainer();
 
         // set routes based on settings.php
         $this->setRoutes();
 
+        $this->setViews();
+        $this->setControllers();
+        
         // initialise Cobalt SDK
         $this->initCobaltSDK();
-
-        $this->container = $this->app->getContainer();
-        $this->container['cobalt'] = $this->sdk;
-        $this->container['siteService'] = $this->siteService;
-        $this->container['sitemap'] = $this->sitemap;
-
-        $this->setViewHandler();
-        $this->setControllerHandler();
     }
 
     public function setRoutes() {
         // set routes for HTTP GET
-        foreach ($this->settings['routes'] as $pattern => $controllerMethod) {
+        foreach ($this->settings['routes']['get'] as $pattern => $controllerMethod) {
             $this->app->get($pattern, $controllerMethod);
+        }
+
+        // set routes for HTTP POST
+        foreach ($this->settings['routes']['post'] as $pattern => $controllerMethod) {
+            $this->app->post($pattern, $controllerMethod);
         }
     }
 
-    public function initCobaltSDK() {
-        $this->sdk = new CobaltSDK($this->settings['discoveryUri']);
-        $this->siteService = $this->sdk->getSiteService($this->settings['siteName']);
-        $this->sitemap = $this->siteService->getSitemap();
+    public function setControllers() {
+        $this->container['PageController'] = function($container) {
+            return new PageController($container);
+        };
+
+        $this->container['AuthController'] = function($container) {
+            return new AuthController($container);
+        };
     }
 
-    public function setViewHandler() {
+    public function setViews() {
         $this->container['view'] = function($container) {
             $view = new Twig($container->get('settings')['templatePath'], [
-                'cache' => false
+                'cache' => false,
+                'debug' => true
             ]);
             $basePath = rtrim(str_ireplace('index.php', '', $container->get('request')->getUri()->getBasePath()), '/');
             $view->addExtension(new TwigExtension($container->get('router'), $basePath));
@@ -77,10 +85,18 @@ class Autoload {
         };
     }
 
-    public function setControllerHandler() {
-        $this->container['PageController'] = function($container) {
-            return new PageController($container);
-        };
+    public function initCobaltSDK() {
+        try {
+            $this->sdk = new CobaltSDK($this->settings['discoveryUri']);
+            $this->siteService = $this->sdk->getSiteService($this->settings['siteName']);
+            $this->sitemap = $this->siteService->getSitemap();
+            $this->container['cobalt'] = $this->sdk;
+            $this->container['siteService'] = $this->siteService;
+            $this->container['sitemap'] = $this->sitemap;
+
+        } catch (ServiceNotAvailableException $ex) {
+            // TODO call error.twig.html
+        }
     }
 
     public function getApp() {
@@ -88,9 +104,3 @@ class Autoload {
     }
 
 }
-
-if (!isset($autoload) || $autoload == null) {
-    $settings = require_once('settings.php');
-    $autoload = new Autoload($settings);
-}
-$app = $autoload->getApp();
