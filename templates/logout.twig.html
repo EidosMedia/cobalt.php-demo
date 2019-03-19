@@ -2,7 +2,7 @@
 <div class="row">
         <form action="/logout" method="POST">
         <div class="col-xs-4 input-group">
-                <div class="navbar-brand" for="btnLogout">Welcome {{ session.user.name|upper }}!</div>
+                <div class="navbar-brand" for="btnLogout">Welcome {{ context.cobalt.authContext.currAuth.user.name|upper }}!</div>
                 &nbsp;&nbsp;
             <button id="btnLogout" class="btn btn-secondary" type="submit">Logout</button>
         </div>

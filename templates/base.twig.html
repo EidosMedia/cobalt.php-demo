@@ -22,6 +22,9 @@
     <!-- Custom styles for this template -->
     <link href="css/blog.css" rel="stylesheet">
 
+    <!-- Font Awesome 5.7.2 -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
   </head>
 
   <body>
@@ -33,7 +36,9 @@
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
     </button>
-    {% if session.user is defined %}
+    <br/>
+    <br/>
+    {% if context.cobalt.authContext.currAuth.user is defined %}
 		{{ include('logout.twig.html') }}
     {% else %}
 		{{ include('login.twig.html') }}
@@ -55,19 +60,6 @@
 
         <!-- Sidebar Widgets Column -->
         <div class="col-md-4">
-
-          <!-- Search Widget -->
-          <div class="card my-4">
-            <h5 class="card-header">Search</h5>
-            <div class="card-body">
-              <div class="input-group">
-                <input type="text" class="form-control" placeholder="Search for...">
-                <span class="input-group-btn">
-                  <button class="btn btn-secondary" type="button">Go!</button>
-                </span>
-              </div>
-            </div>
-          </div>
 
           <!-- Sections Widget -->
           <div class="card my-4">
@@ -99,6 +91,10 @@
 
       </div>
       <!-- /.row -->
+
+      {{ include('posts.add.twig.html') }}
+      <br/><br/>
+      {{ include('posts.list.twig.html') }}
 
     </div>
     <!-- /.container -->
