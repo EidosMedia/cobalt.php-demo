@@ -6,7 +6,6 @@ use App\Controllers\AuthenticationController;
 use App\Controllers\CommentsController;
 use App\Controllers\PageController;
 use Eidosmedia\Cobalt\CobaltSDK;
-use Eidosmedia\Cobalt\Comments\Entities\PostOptions;
 use Eidosmedia\Cobalt\Commons\Exceptions\ServiceNotAvailableException;
 use Slim\App;
 use Slim\Views\Twig;
@@ -22,7 +21,7 @@ class Autoload {
 
     public function __construct($settings) {
         // load slim, twig and other dependencies only if autoload class is instanciated
-        require_once('../vendor/autoload.php');
+        require_once(__DIR__ . '/../vendor/autoload.php');
         $this->settings = $settings;
 
         // start slim/twig with all settings from settings.php
@@ -83,7 +82,6 @@ class Autoload {
                     $section = $container->sitemap->getSection($node->getPubInfo()->getSectionPath());
                     $url = $section->getPubInfo()->getCanonical() . $node->getId() . '/' . preg_replace('/[^a-z0-9]+/', '-', strtolower($node->getTitle())) . '/index.html';
                 }
-
                 if (S::startsWith($url, '/')) {
                     $url = substr($url, 1);
                 }
@@ -101,13 +99,12 @@ class Autoload {
             $this->container['siteService'] = $this->sdk->getSiteService($this->settings['siteName']);
             $this->container['sitemap'] = $this->container['siteService']->getSitemap();
             $this->container['directoryService'] = $this->sdk->getDirectoryService();
-            $this->container['directoryService']->login('admin', 'admin');
             $this->container['commentsService'] = $this->sdk->getCommentsService();
 
-        } catch (ServiceNotAvailableException $ex) {
+        } catch (\ServiceNotAvailableException $ex) {
             // TODO call error.twig.html
 
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // TODO call error.twig.html
         }
     }
