@@ -88,13 +88,18 @@
           </div>
 
         </div>
+		<br/>
+		<div class="col-md-8">
+      <h5 class="card-header">Comments</h5>
+      <div class="card-body">
+        {{ include('posts.add.twig.html') }}
+        <br/><br/>
+        {{ include('posts.list.twig.html') }}
+      </div>
+		</div>
 
       </div>
       <!-- /.row -->
-
-      {{ include('posts.add.twig.html') }}
-      <br/><br/>
-      {{ include('posts.list.twig.html') }}
 
     </div>
     <!-- /.container -->

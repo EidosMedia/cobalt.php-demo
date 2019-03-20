@@ -1,26 +1,15 @@
 {% block content %}
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-Add Comment
-</button>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-<div class="modal-dialog" role="document">
-	<div class="modal-content">
-	<div class="modal-header">
-		<h5 class="modal-title" id="exampleModalLabel">Add Comment</h5>
-		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-		</button>
-	</div>
-	<div class="modal-body">
-		<textarea class="form-control rounded-0" id="exampleFormControlTextarea2" rows="3"></textarea>
-	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	</div>
-	</div>
-</div>
-</div>
+	{% if context.cobalt.authContext.currAuth.user is defined %}
+		<form id="frmAddComment" action="/comments/add" method="POST">
+			<div>
+				<textarea class="form-control rounded-0" id="txtPostContent" name="txtPostContent" rows="5"></textarea>
+				<br/>
+				<button id="btnSendComment" type="submit" class="btn btn-primary" data-dismiss="modal" form="frmAddComment">Send Comment</button>
+			</div>
+		</form>
+	{% else %}
+		<div class="alert alert-warning">
+			Please, login first to comment.
+		</div>
+	{% endif %}
 {% endblock %}
