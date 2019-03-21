@@ -5,12 +5,14 @@
           <h1 class="mt-4">{{ page.currentObject.title }}</h1>
 
           <!-- Author -->
+          {% if page.currentObject.authors is iterable %} 
           <p class="lead">
             by
             {% for author in page.currentObject.authors %}
             <a href="#">{{ author }}</a>
             {% endfor %}
           </p>
+          {% endif %}
 
           <hr>
 
@@ -28,4 +30,10 @@
 
           <!-- Post Content -->
           {{ page.currentObject.transformContentDocument(source('_xslt/article.xsl'))|raw }}
+
+          <br/>
+              <h5 class="card-header">Comments</h5>
+              {{ include('posts.list.twig.html') }}
+              {{ include('posts.add.twig.html') }}
+              <br/>
 {% endblock %}

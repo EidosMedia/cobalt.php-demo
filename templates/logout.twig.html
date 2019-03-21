@@ -1,6 +1,6 @@
 {% block logout %}
 <div class="row">
-        <form action="/logout" method="POST">
+        <form action="logout" method="POST">
         <div class="col-xs-4 input-group">
                 <div class="navbar-brand" for="btnLogout">Welcome {{ context.cobalt.authContext.currAuth.user.name|upper }}!</div>
                 &nbsp;&nbsp;

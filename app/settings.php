@@ -13,27 +13,23 @@ if (getenv('CPD_SITENAME')) {
 $routes = [
     'get' => [
         '{section:.*}/{id:[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{4}}/{title:[a-zA-Z0-9\-_]+}/index.html' => 'PageController:renderPageById',
-        '{path:.*}' => 'PageController:renderPageByPath',
-        '{path:/error}' => 'PageController:renderError'
+        '{path:error}' => 'PageController:renderError',
+        '{path:.*}' => 'PageController:renderPageByPath'
     ],
     'post' => [
-        '{path:/login}' => 'AuthenticationController:login',
-        '{path:/logout}' => 'AuthenticationController:logout',
-        '{section:.*}/{id:[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{4}}/{title:[a-zA-Z0-9\-_]+}/comments' => 'CommentsController:listPosts',
-        '{section:.*}/{id:[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{4}}/{title:[a-zA-Z0-9\-_]+}/comments/add' => 'CommentsController:addPost',
-        '{section:.*}/{id:[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{4}}/{title:[a-zA-Z0-9\-_]+}/comments/update/{postId:.*}' => 'CommentsController:updatePost',
-        '{section:.*}/{id:[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{4}}/{title:[a-zA-Z0-9\-_]+}/comments/delete/{postId:.*}' => 'CommentsController:deletePost',
+        '{path:.*/login}' => 'AuthenticationController:login',
+        '{path:.*/logout}' => 'AuthenticationController:logout',
+        '{path:.*/comments/add}' => 'CommentsController:addPost'
     ]
 ];
 
 $settings = [
     'debug' => true,
     'displayErrorDetails' => true,
-    'templatePath' => '../templates/',
+    'templatePath' => __DIR__ . '/../templates/',
     'discoveryUri' => $discoveryUri,
     'siteName' => $siteName,
-    'routes' => $routes,
-    'sessionExpirationTime' => 60 * 30
+    'routes' => $routes
 ];
 
 return $settings;
