@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use Eidosmedia\Cobalt\Comments\Entities\PostOptions;
+
 class PageController {
 
     private $container;
@@ -11,19 +13,34 @@ class PageController {
     }
 
     public function renderPageByPath($request, $response, $args) {
-        $path = $args['path'];
-        return $this->renderPage($path, $request, $response, $args);
+        return $this->renderPage($args['path'], $request, $response, $args);
     }
 
     public function renderPageById($request, $response, $args) {
-        $id = $args['id'];
-        $commentsController = new CommentsController($this->container);
-        $args['posts'] = $commentsController->listPosts($request, $response, $args);
-        return $this->renderPage($id, $request, $response, $args);
+        try {
+            $postOptions = new PostOptions();
+            $postOptions->setExternalObjectId($args['id']);
+            $postOptions->setLimit(3);
+            $this->container['directoryService']->login('admin', 'admin');
+            $this->container['posts'] = $this->container['commentsService']->listPosts($postOptions);
+
+        } catch (\Exception $ex) {
+            $this->container['error'] = $this->parseResponseError($ex->getBody());
+        }
+
+        return $this->renderPage($args['id'], $request, $response, $args);
     }
 
     public function renderError($request, $response, $args) {
         return $this->renderPage('/error', $request, $response, $args);
+    }
+
+    private function parseResponseError($body) {
+        if (isset($body)) {
+            return json_decode($body, true)['error']['message'];
+        }
+
+        return 'Unable to extract error message';
     }
 
     private function getPageType($page, $args) {
@@ -35,7 +52,7 @@ class PageController {
             if (!$this->container->view->getLoader()->exists($template)) {
                 // 500 error - template not available
                 $template = 'error.twig.html';
-                $args['error'] = 'Template not found for type ' . $currentObject->getSys()->getType();
+                $this->container['error'] = 'Template not found for type ' . $currentObject->getSys()->getType();
             }
         }
 
@@ -47,9 +64,11 @@ class PageController {
         $template = $this->getPageType($page, $args);
 
         if (isset($args['error'])) {
+            var_dump($args['error']);
+            exit(0);
             $template = 'error.twig.html';
-            $context['error'] = $args['error'];
-            return $this->container->view->render($response, $template, $context);
+            $this->container['error'] = $args['error'];
+            return $this->container->view->render($response, $template, $this->container);
         }
 
         $context = [
@@ -57,8 +76,8 @@ class PageController {
             'sitemap' => $this->container->sitemap
         ];
 
-        if (isset($args['session'])) {
-            $context['session'] = $args['session'];
+        if (isset($this->container['posts'])) {
+            $context['posts'] = $this->container['posts'];
         }
 
         return $this->container->view->render($response, $template, $context);

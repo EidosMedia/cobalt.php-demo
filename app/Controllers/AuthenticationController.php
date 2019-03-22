@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use Eidosmedia\Cobalt\Commons\Exceptions\HttpClientException;
+
 class AuthenticationController {
 
     private $container;
@@ -11,39 +13,31 @@ class AuthenticationController {
     }
 
     public function login($request, $response, $args) {
-        $context = null;
-
         try {
             $body = $request->getParsedBody();
-            $context['session'] = $this->container['directoryService']->login($body['txtUsername'], $body['txtPassword']);
+            $this->container['session'] = $this->container['directoryService']->login($body['txtUsername'], $body['txtPassword']);
 
-        } catch (HttpClientException $ex) {
-            $context['error'] = $this->parseResponseError($ex->getBody());
+        } catch (\HttpClientException $ex) {
+            $this->container['error'] = $this->parseResponseError($ex->getBody());
         
-        } catch(Exception $ex) {
-            $context['error'] = $ex->getMessage();
+        } catch(\Exception $ex) {
+            $this->container['error'] = $ex->getMessage();
         }
 
-
-        $this->handleError($request, $response, $args, $context);
-        $args['session'] = $context['session'];
         return $this->renderPage($request, $response, $args);
     }
 
     public function logout($request, $response, $args) {
-        $context = null;
-
         try {
-            $context['logout'] = $this->container['directoryService']->logout();
+            $this->container['logout'] = $this->container['directoryService']->logout();
 
-        } catch (HttpClientException $ex) {
-            $context['error'] = $this->parseResponseError($ex->getBody());
+        } catch (\HttpClientException $ex) {
+            $this->container['error'] = $this->parseResponseError($ex->getBody());
 
-        } catch(Exception $ex) {
-            $context['error'] = $ex->getMessage();
+        } catch(\Exception $ex) {
+            $this->container['error'] = $ex->getMessage();
         }
 
-        $this->handleError($request, $response, $args, $context);
         return $this->renderPage($request, $response, $args);
     }
 
@@ -55,15 +49,12 @@ class AuthenticationController {
         return 'Unable to extract error message';
     }
 
-    private function handleError($request, $response, $args, $context) {
-        if (isset($context['error'])) {
-            // handle error here
-        }
-    }
-
     private function renderPage($request, $response, $args) {
         $pageController = new PageController($this->container);
         $args['path'] = '/';
+        if (isset($args['error'])) {
+            $pageController->renderError($request, $response, $args);
+        }
         return $pageController->renderPageByPath($request, $response, $args);
     }
 

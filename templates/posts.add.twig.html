@@ -1,6 +1,6 @@
 {% block content %}
 	{% if context.cobalt.authContext.currAuth.user is defined %}
-		<form id="frmAddComment" action="comments/add" method="POST">
+		<form id="frmAddComment" name="frmAddComment" action="comments/add" method="POST">
 			<textarea class="form-control rounded-0" id="txtPostContent" name="txtPostContent" rows="5"></textarea>
 			<br/>
 			<button id="btnSendComment" type="submit" class="text-right btn btn-primary" data-dismiss="modal" form="frmAddComment">Send Comment</button>

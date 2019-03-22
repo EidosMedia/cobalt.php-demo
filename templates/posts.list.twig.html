@@ -1,15 +1,15 @@
 {% block content %}
-	{% if context.posts.result is iterable %}
-		{% for post in context.posts.result %}
-			<div class="card mb-4">
-				<div class="card-header">
-					On {{  post.created|date('d M Y  H:i:s e')  }} by {{  post.lastModifierAlias  }}
-				</div>
-				<div class="card-body">
-					{{  post.content  }}
-				</div>
+{% if context.posts is defined and context.posts.result is iterable %}
+	{% for post in context.posts.result %}
+		<div class="card mb-4">
+			<div class="card-header">
+				On {{  post.created|date('d M Y  H:i:s e')  }} by {{  post.lastModifierAlias  }}
 			</div>
-		{% endfor %}
-		<br/>
-	{% endif %}
+			<div class="card-body">
+				{{  post.content  }}
+			</div>
+		</div>
+	{% endfor %}
+{% endif %}
+<br/>
 {% endblock %}
