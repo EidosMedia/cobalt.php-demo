@@ -2,9 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Services\CobaltService;
-
-
 class BaseController {
 
     protected $container;
@@ -23,10 +20,7 @@ class BaseController {
     }
 
     public function getCobaltServices($settings) {
-        if (!isset(self::$cobaltServices)) {
-            self::$cobaltServices = new CobaltService($settings);
-        }
-        return self::$cobaltServices;
+        return $this->container->CobaltService;
     }
 
 }

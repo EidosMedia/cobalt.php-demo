@@ -19,7 +19,7 @@ $routes = [
     'post' => [
         '{path:.*/login}' => 'AuthenticationController:login',
         '{path:.*/logout}' => 'AuthenticationController:logout',
-        '{path:.*}/{id:[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{4}}/{commentsOp:comments/add}' => 'CommentsController:addPost'
+        '{section:.*}/{id:[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{4}}/{title:[a-zA-Z0-9\-_]+}/comments/add' => 'CommentsController:addPost'
     ]
 ];
 

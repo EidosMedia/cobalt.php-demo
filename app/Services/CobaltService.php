@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Eidosmedia\Cobalt\CobaltSDK;
+use Eidosmedia\Cobalt\Directory\Entities\SessionUserData;
 
 class CobaltService {
 
@@ -18,6 +19,10 @@ class CobaltService {
         $this->sitemap = $this->siteService->getSitemap();
         $this->directoryService = $this->sdk->getDirectoryService();
         $this->commentsService = $this->sdk->getCommentsService();
+
+        if (isset($_SESSION) && isset($_SESSION['sessionUserData'])) {
+            $this->sdk->getAuthContext()->pushAuth(unserialize($_SESSION['sessionUserData']));
+        }
     }
 
     public function getSDK() {

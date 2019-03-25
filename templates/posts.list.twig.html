@@ -1,6 +1,6 @@
 {% block content %}
-{% if context.posts is defined and context.posts.result is iterable %}
-	{% for post in context.posts.result %}
+{% if posts is defined and posts.result is iterable %}
+	{% for post in posts.result %}
 		<div class="card mb-4">
 			<div class="card-header">
 				On {{  post.created|date('d M Y  H:i:s e')  }} by {{  post.lastModifierAlias  }}

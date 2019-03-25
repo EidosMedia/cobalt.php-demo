@@ -19,19 +19,6 @@ class PageController extends BaseController {
     }
 
     public function renderPageById($request, $response, $args) {
-        try {
-            $postOptions = new PostOptions();
-            $postOptions->setExternalObjectId($args['id']);
-            $postOptions->setLimit(3);
-            $this->container['posts'] = $this->cobaltServices->getCommentsService()->listPosts($postOptions);
-
-        } catch (\HttpClientException $ex) {
-            $_SESSION['error'] = $this->parseResponseError($ex->getBody());
-
-        } catch (\Exception $ex) {
-            $_SESSION['error'] = $ex->getMessage();
-        }
-
         return $this->renderPage($args['id'], $request, $response, $args);
     }
 
@@ -59,20 +46,34 @@ class PageController extends BaseController {
         $page = $this->cobaltServices->getSiteService($_SESSION['settings']['siteName'])->getPage($nodeOrIdOrPath);
         $template = $this->getPageType($page, $args);
 
+
+
         if (isset($args['error'])) {
             $template = 'error.twig.html';
             $this->container['error'] = $args['error'];
             return $this->container->view->render($response, $template, $this->container);
         }
 
+        $sitemap = $this->cobaltServices->getSitemap();
+
         $context = [
             'page' => $page,
-            'sitemap' => $this->cobaltServices->getSiteService($_SESSION['settings']['siteName'])->getSitemap()
+            'sitemap' => $sitemap,
+            'section' => $args['section'],
+            'id' => $args['id'],
+            'title' => $args['title']
         ];
-        $this->container['sitemap'] = $context['sitemap'];
 
-        if (isset($this->container['posts'])) {
-            $context['posts'] = $this->container['posts'];
+        // require only for page with base type article
+        try {
+            $postOptions = new PostOptions();
+            $postOptions->setExternalObjectId($page->getModel()->getData()->getId());
+            $postOptions->setLimit(10);
+            $context['posts'] = $this->cobaltServices->getCommentsService()->listPosts($postOptions);
+        } catch (\HttpClientException $ex) {
+            $_SESSION['error'] = $this->parseResponseError($ex->getBody());
+        } catch (\Exception $ex) {
+            $_SESSION['error'] = $ex->getMessage();
         }
 
         return $this->container->view->render($response, $template, $context);

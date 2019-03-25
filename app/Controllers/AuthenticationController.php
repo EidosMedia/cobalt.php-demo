@@ -17,35 +17,31 @@ class AuthenticationController extends BaseController {
     public function login($request, $response, $args) {
         try {
             $body = $request->getParsedBody();
-            $_SESSION['session'] = [
-                'user' => $body['txtUsername'],
-                'password' => $body['txtPassword'],
-                'token' => $this->directoryService->login($body['txtUsername'], $body['txtPassword'])->getSession()->getId()
-            ];
-
+            $sessionUserData = $this->directoryService->login($body['txtUsername'], $body['txtPassword']);
+            $_SESSION['sessionUserData'] = serialize($sessionUserData);
         } catch (\HttpClientException $ex) {
             $_SESSION['error'] = $this->parseResponseError($ex->getBody());
-        
         } catch(\Exception $ex) {
             $_SESSION['error'] = $ex->getMessage();
         }
 
-        return $this->renderPage($request, $response, $args);
+        return $response->withStatus(302)->withHeader('Location', $this->container->router->pathFor('PageController:renderPageByPath', ['path' => '']));
+        //return $this->renderPage($request, $response, $args);
     }
 
     public function logout($request, $response, $args) {
         try {
             $this->directoryService->logout();
-            session_destroy();
-
         } catch (\HttpClientException $ex) {
             $_SESSION['error'] = $this->parseResponseError($ex->getBody());
-
         } catch(\Exception $ex) {
             $_SESSION['error'] = $ex->getMessage();
         }
 
-        return $this->renderPage($request, $response, $args);
+        session_destroy();
+
+        return $response->withStatus(302)->withHeader('Location', $this->container->router->pathFor('PageController:renderPageByPath', ['path' => '']));
+        //return $this->renderPage($request, $response, $args);
     }
 
     private function renderPage($request, $response, $args) {

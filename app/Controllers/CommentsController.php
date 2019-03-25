@@ -15,35 +15,23 @@ class CommentsController extends BaseController {
     }
 
     public function addPost($request, $response, $args) {
+        $sitemap = $this->cobaltServices->getSitemap();
+        $siteId = $sitemap->getRoot()->getId();
+
         $body = $request->getParsedBody();
-        $post = $this->preparePost($body, $args);
-
-        try {
-            $this->cobaltServices->getCommentsService()->createPost($post);
-
-        } catch (\Exception $ex) {
-            $_SESSION['error'] = $this->parseResponseError($ex->getBody());
-        }
-
-        return $this->renderPage($request, $response, $args);
-    }
-
-    private function preparePost($body, $args) {
         $post = new Post();
         $post->setExternalObjectId($args['id']);
-        $post->setDomainExternalObjectId($args['id']);
-        $post->setForumExternalObjectId($args['id']);
+        $post->setDomainExternalObjectId($siteId);
+        $post->setForumExternalObjectId($siteId);
         $post->setContent($body['txtPostContent']);
-        return $post;
-    }
 
-    private function renderPage($request, $response, $args) {
-        $pageController = new PageController($this->container);
-        foreach ($args as $key => $value) {
-            $this->container[$key] = $value;
+        try {
+            $post = $this->cobaltServices->getCommentsService()->createPost($post);
+        } catch (\Exception $ex) {
+            $_SESSION['error'] = $ex->getMessage();
         }
-        $this->container['path'] = '/';
-        return $pageController->renderPageByPath($request, $response, $this->container);
+
+        return $response->withStatus(302)->withHeader('Location', $this->container->router->pathFor('PageController:renderPageById', $args));
     }
 
 }
