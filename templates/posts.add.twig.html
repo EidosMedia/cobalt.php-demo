@@ -1,5 +1,5 @@
 {% block content %}
-	{% if context.cobalt.authContext.currAuth.user is defined %}
+	{% if session is defined %}
 		<form id="frmAddComment" name="frmAddComment" action="comments/add" method="POST">
 			<textarea class="form-control rounded-0" id="txtPostContent" name="txtPostContent" rows="5"></textarea>
 			<br/>

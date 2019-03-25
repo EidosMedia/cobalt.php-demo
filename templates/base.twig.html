@@ -36,7 +36,7 @@
     </button>
     <br/>
     <br/>
-    {% if context.cobalt.authContext.currAuth.user is defined %}
+    {% if session is defined %}
 		{{ include('logout.twig.html') }}
     {% else %}
 		{{ include('login.twig.html') }}
