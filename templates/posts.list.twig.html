@@ -1,0 +1,15 @@
+{% block content %}
+{% if posts is defined and posts.result is iterable %}
+	{% for post in posts.result %}
+		<div class="card mb-4">
+			<div class="card-header">
+				On {{  post.created|date('d M Y  H:i:s e')  }} by {{  post.lastModifierAlias  }}
+			</div>
+			<div class="card-body">
+				{{  post.content  }}
+			</div>
+		</div>
+		<br/>
+		{% endfor %}
+{% endif %}
+{% endblock %}
