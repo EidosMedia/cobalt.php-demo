@@ -11,14 +11,24 @@ if (getenv('CPD_SITENAME')) {
 }
 
 $routes = [
-    '{section:.*}/{id:[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{4}}/{title:[a-zA-Z0-9\-_]+}/index.html' => 'PageController:renderPageById',
-    '{path:.*}' => 'PageController:renderPageByPath'
+    'get' => [
+        '{section:.*}/{id:[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{4}}/{title:[a-zA-Z0-9\-_]+}/index.html' => 'PageController:renderPageById',
+        '{path:error}' => 'PageController:renderError',
+        '{path:.*}' => 'PageController:renderPageByPath'
+    ],
+    'post' => [
+        '{path:.*/login}' => 'AuthenticationController:login',
+        '{path:.*/logout}' => 'AuthenticationController:logout',
+        '{section:.*}/{id:[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{12}-[a-zA-Z0-9]{4}}/{title:[a-zA-Z0-9\-_]+}/comments/add' => 'CommentsController:addPost'
+    ]
 ];
 
 $settings = [
     'debug' => true,
     'displayErrorDetails' => true,
-    'templatePath' => '../templates/',
+    'templatePath' => __DIR__ . '/../templates/',
+    'tenant' => null,
+    'realm' => null,
     'discoveryUri' => $discoveryUri,
     'siteName' => $siteName,
     'routes' => $routes

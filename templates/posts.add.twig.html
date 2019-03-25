@@ -1,0 +1,13 @@
+{% block content %}
+	{% if session is defined %}
+		<form id="frmAddComment" name="frmAddComment" action="./{{section}}/{{id}}/{{title}}/comments/add" method="POST">
+			<textarea class="form-control rounded-0" id="txtPostContent" name="txtPostContent" rows="5"></textarea>
+			<br/>
+			<button id="btnSendComment" type="submit" class="text-right btn btn-primary" data-dismiss="modal" form="frmAddComment">Send Comment</button>
+		</form>
+	{% else %}
+		<div class="alert alert-warning">
+			Please, login first to comment.
+		</div>
+	{% endif %}
+{% endblock %}
