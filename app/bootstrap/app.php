@@ -4,8 +4,6 @@ use App\Controllers\AuthenticationController;
 use App\Controllers\CommentsController;
 use App\Controllers\PageController;
 use App\Middlewares\AuthenticationMiddleware;
-use Eidosmedia\Cobalt\CobaltSDK;
-use Eidosmedia\Cobalt\Directory\Entities\SessionUserData;
 use Slim\App;
 use Slim\Views\Twig;
 use Slim\Views\TwigExtension;
@@ -13,8 +11,12 @@ use Stringy\StaticStringy as S;
 use Twig\Extension\DebugExtension;
 
 session_start();
+
 require_once(__DIR__ . '/../../vendor/autoload.php');
+
 $app = new App(['settings' => $settings]);
+
+$_SESSION['settings'] = $settings;
 
 // set routes for HTTP GET
 foreach ($settings['routes']['get'] as $pattern => $controllerMethod) {
@@ -27,6 +29,7 @@ foreach ($settings['routes']['post'] as $pattern => $controllerMethod) {
 }
 
 $container = $app->getContainer();
+
 $container['view'] = function($container) {
     $view = new Twig($container->get('settings')['templatePath'], [
         'cache' => false,
@@ -38,10 +41,6 @@ $container['view'] = function($container) {
     $view->addExtension(new TwigExtension($container->router, $container->request->getUri()));
 
     $view->getEnvironment()->addGlobal('context', $container);
-
-    $view->getEnvironment()->addFunction(new \Twig_Function('parseSession', function($sessionUserData) use ($container) {
-        return new SessionUserData($sessionUserData);
-    }));
 
     $view->getEnvironment()->addFunction(new \Twig_Function('evalUrl', function($node) use ($container) {
         $url = $node->getPubInfo()->getCanonical();
@@ -72,20 +71,3 @@ $container['CommentsController'] = function($container) {
 
 // login/logout middleware
 $app->add(new AuthenticationMiddleware($container));
-
-try {
-    $tenant = (isset($tenant)) ? $tenant : null;
-    $realm = (isset($realm)) ? $realm : null;
-    $sdk = new CobaltSDK($settings['discoveryUri'], $tenant, $realm);
-    $container['cobalt'] = $sdk;
-    $container['siteService'] = $sdk->getSiteService($settings['siteName']);
-    $container['sitemap'] = $container['siteService']->getSitemap();
-    $container['directoryService'] = $sdk->getDirectoryService();
-    $container['commentsService'] = $sdk->getCommentsService();
-
-} catch (\ServiceNotAvailableException $ex) {
-    // TODO call error.twig.html
-
-} catch (\Exception $ex) {
-    // TODO call error.twig.html
-}

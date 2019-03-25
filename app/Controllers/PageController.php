@@ -3,13 +3,15 @@
 namespace App\Controllers;
 
 use Eidosmedia\Cobalt\Comments\Entities\PostOptions;
+use App\Controllers\BaseController;
 
-class PageController {
+class PageController extends BaseController {
 
-    private $container;
+    protected $cobaltServices;
 
     public function __construct($container) {
-        $this->container = $container;
+        parent::__construct($container);
+        $this->cobaltServices = $this->getCobaltServices($container->get('settings'));
     }
 
     public function renderPageByPath($request, $response, $args) {
@@ -21,11 +23,13 @@ class PageController {
             $postOptions = new PostOptions();
             $postOptions->setExternalObjectId($args['id']);
             $postOptions->setLimit(3);
-            $this->container['directoryService']->login('admin', 'admin');
-            $this->container['posts'] = $this->container['commentsService']->listPosts($postOptions);
+            $this->container['posts'] = $this->cobaltServices->getCommentsService()->listPosts($postOptions);
+
+        } catch (\HttpClientException $ex) {
+            $_SESSION['error'] = $this->parseResponseError($ex->getBody());
 
         } catch (\Exception $ex) {
-            $this->container['error'] = $this->parseResponseError($ex->getBody());
+            $_SESSION['error'] = $ex->getMessage();
         }
 
         return $this->renderPage($args['id'], $request, $response, $args);
@@ -33,14 +37,6 @@ class PageController {
 
     public function renderError($request, $response, $args) {
         return $this->renderPage('/error', $request, $response, $args);
-    }
-
-    private function parseResponseError($body) {
-        if (isset($body)) {
-            return json_decode($body, true)['error']['message'];
-        }
-
-        return 'Unable to extract error message';
     }
 
     private function getPageType($page, $args) {
@@ -52,7 +48,7 @@ class PageController {
             if (!$this->container->view->getLoader()->exists($template)) {
                 // 500 error - template not available
                 $template = 'error.twig.html';
-                $this->container['error'] = 'Template not found for type ' . $currentObject->getSys()->getType();
+                $_SESSION['error'] = 'Template not found for type ' . $currentObject->getSys()->getType();
             }
         }
 
@@ -60,12 +56,10 @@ class PageController {
     }
 
     public function renderPage($nodeOrIdOrPath, $request, $response, $args) {
-        $page = $this->container->siteService->getPage($nodeOrIdOrPath);
+        $page = $this->cobaltServices->getSiteService($_SESSION['settings']['siteName'])->getPage($nodeOrIdOrPath);
         $template = $this->getPageType($page, $args);
 
         if (isset($args['error'])) {
-            var_dump($args['error']);
-            exit(0);
             $template = 'error.twig.html';
             $this->container['error'] = $args['error'];
             return $this->container->view->render($response, $template, $this->container);
@@ -73,8 +67,9 @@ class PageController {
 
         $context = [
             'page' => $page,
-            'sitemap' => $this->container->sitemap
+            'sitemap' => $this->cobaltServices->getSiteService($_SESSION['settings']['siteName'])->getSitemap()
         ];
+        $this->container['sitemap'] = $context['sitemap'];
 
         if (isset($this->container['posts'])) {
             $context['posts'] = $this->container['posts'];

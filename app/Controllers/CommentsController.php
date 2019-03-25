@@ -3,13 +3,15 @@
 namespace App\Controllers;
 
 use Eidosmedia\Cobalt\Comments\Entities\Post;
+use App\Controllers\BaseController;
 
-class CommentsController {
+class CommentsController extends BaseController {
 
-    private $container;
+    protected $cobaltServices;
 
     public function __construct($container) {
-        $this->container = $container;
+        parent::__construct($container);
+        $this->cobaltServices = $this->getCobaltServices($container->get('settings'));
     }
 
     public function addPost($request, $response, $args) {
@@ -17,22 +19,13 @@ class CommentsController {
         $post = $this->preparePost($body, $args);
 
         try {
-            $this->container['directoryService']->login('admin', 'admin');
-            $this->container['commentsService']->createPost($post);
+            $this->cobaltServices->getCommentsService()->createPost($post);
 
         } catch (\Exception $ex) {
-            $this->container['error'] = $this->parseResponseError($ex->getBody());
+            $_SESSION['error'] = $this->parseResponseError($ex->getBody());
         }
 
         return $this->renderPage($request, $response, $args);
-    }
-
-    private function parseResponseError($body) {
-        if (isset($body)) {
-            return json_decode($body, true)['error']['message'];
-        }
-
-        return 'Unable to extract error message';
     }
 
     private function preparePost($body, $args) {

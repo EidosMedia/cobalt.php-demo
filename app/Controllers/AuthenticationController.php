@@ -2,26 +2,32 @@
 
 namespace App\Controllers;
 
-use Eidosmedia\Cobalt\Commons\Exceptions\HttpClientException;
+use App\Controllers\BaseController;
 
-class AuthenticationController {
+class AuthenticationController extends BaseController {
 
-    private $container;
+    protected $directoryService;
 
     public function __construct($container) {
-        $this->container = $container;
+        parent::__construct($container);
+        $cobaltServices = $this->getCobaltServices($container->get('settings'));
+        $this->directoryService = $cobaltServices->getDirectoryService();
     }
 
     public function login($request, $response, $args) {
         try {
             $body = $request->getParsedBody();
-            $this->container['session'] = $this->container['directoryService']->login($body['txtUsername'], $body['txtPassword']);
+            $_SESSION['session'] = [
+                'user' => $body['txtUsername'],
+                'password' => $body['txtPassword'],
+                'token' => $this->directoryService->login($body['txtUsername'], $body['txtPassword'])->getSession()->getId()
+            ];
 
         } catch (\HttpClientException $ex) {
-            $this->container['error'] = $this->parseResponseError($ex->getBody());
+            $_SESSION['error'] = $this->parseResponseError($ex->getBody());
         
         } catch(\Exception $ex) {
-            $this->container['error'] = $ex->getMessage();
+            $_SESSION['error'] = $ex->getMessage();
         }
 
         return $this->renderPage($request, $response, $args);
@@ -29,24 +35,17 @@ class AuthenticationController {
 
     public function logout($request, $response, $args) {
         try {
-            $this->container['logout'] = $this->container['directoryService']->logout();
+            $this->directoryService->logout();
+            session_destroy();
 
         } catch (\HttpClientException $ex) {
-            $this->container['error'] = $this->parseResponseError($ex->getBody());
+            $_SESSION['error'] = $this->parseResponseError($ex->getBody());
 
         } catch(\Exception $ex) {
-            $this->container['error'] = $ex->getMessage();
+            $_SESSION['error'] = $ex->getMessage();
         }
 
         return $this->renderPage($request, $response, $args);
-    }
-
-    private function parseResponseError($body) {
-        if (isset($body)) {
-            return json_decode($body, true)['error']['message'];
-        }
-
-        return 'Unable to extract error message';
     }
 
     private function renderPage($request, $response, $args) {

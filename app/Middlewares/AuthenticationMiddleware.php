@@ -4,18 +4,15 @@ namespace App\Middlewares;
 
 class AuthenticationMiddleware {
 
-    private $container;
+    protected $container;
 
     public function __construct($container) {
         $this->container = $container;
     }
 
     public function __invoke($request, $response, $next) {
-        if (!isset($_SESSION['logout'])) {
-            $this->container->view->getEnvironment()->addGlobal('session', $_SESSION['session']);
-
-        } else {
-            var_dump($_SESSION['logout']);
+        if (isset($_SESSION['session'])) {
+                $this->container->view->getEnvironment()->addGlobal('session', $_SESSION['session']);
         }
 
         $response = $next($request, $response);
